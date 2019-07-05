@@ -47,6 +47,8 @@ class _ProductsPageState extends State<ProductsPage> {
         Widget content = Center(
           child: Text('No Products Found!'),
         );
+        print(model.displayedProducts.length);
+        print(model.isLoading);
         if (model.displayedProducts.length > 0 && !model.isLoading) {
           content = Products();
         } else if (model.isLoading) {
