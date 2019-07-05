@@ -13,12 +13,12 @@ class ProductsPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _ProductsPageState();
-  } 
+  }
 }
 
-class _ProductsPageState extends State<ProductsPage>{
+class _ProductsPageState extends State<ProductsPage> {
   @override
-  initState(){
+  initState() {
     widget.model.fetchProducts();
     super.initState();
   }
@@ -41,6 +41,22 @@ class _ProductsPageState extends State<ProductsPage>{
     );
   }
 
+  Widget _buildProductsList() {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget content = Center(
+          child: Text('No Products Found!'),
+        );
+        if (model.displayedProducts.length > 0 && !model.isLoading) {
+          content = Products();
+        } else if (model.isLoading) {
+          content = Center(child: CircularProgressIndicator());
+        }
+        return content;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,10 +64,12 @@ class _ProductsPageState extends State<ProductsPage>{
       appBar: AppBar(
         title: Text('EasyList'),
         actions: <Widget>[
-          ScopedModelDescendant<MainModel>(builder:
-              (BuildContext context, Widget child, MainModel model) {
+          ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
             return IconButton(
-              icon: Icon(model.displayFavoritesOnly ? Icons.favorite : Icons.favorite_border),
+              icon: Icon(model.displayFavoritesOnly
+                  ? Icons.favorite
+                  : Icons.favorite_border),
               onPressed: () {
                 model.toggleDisplayMode();
               },
@@ -59,7 +77,7 @@ class _ProductsPageState extends State<ProductsPage>{
           }),
         ],
       ),
-      body: Products(),
+      body: _buildProductsList(),
     );
   }
 }
