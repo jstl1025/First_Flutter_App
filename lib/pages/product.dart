@@ -9,32 +9,31 @@ import '../scoped-models/main.dart';
 import '../models/product.dart';
 
 class ProductPage extends StatelessWidget {
+  final Product product;
 
-  final int productIndex;
+  ProductPage(this.product);
 
-  ProductPage(this.productIndex);
-
-  Widget _buildAddressPriceRow(double price){
+  Widget _buildAddressPriceRow(double price) {
     return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Union Square, San Francisco',
-                  style: TextStyle(fontFamily: 'Oswald', color: Colors.grey),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Text(
-                    '|',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                Text(
-                  '\$' + price.toString(),
-                  style: TextStyle(fontFamily: 'Oswald', color: Colors.grey),
-                ),
-              ],
-            );
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          'Union Square, San Francisco',
+          style: TextStyle(fontFamily: 'Oswald', color: Colors.grey),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            '|',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+        Text(
+          '\$' + price.toString(),
+          style: TextStyle(fontFamily: 'Oswald', color: Colors.grey),
+        ),
+      ],
+    );
   }
 
   @override
@@ -44,17 +43,19 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context);
         return Future.value(false);
       },
-      child: ScopedModelDescendant<MainModel>(builder:(BuildContext contex, Widget child, MainModel model){
-        Product product = model.allProducts[productIndex];
-
-        return Scaffold(
+      child: Scaffold(
         appBar: AppBar(
           title: Text(product.title),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Image.network(product.image),
+            FadeInImage(
+              image: NetworkImage(product.image),
+              height: 300.0,
+              fit: BoxFit.cover,
+              placeholder: AssetImage('assets/food.jpg'),
+            ),
             Container(
               padding: EdgeInsets.all(10.0),
               child: TitleDefault(product.title),
@@ -69,8 +70,7 @@ class ProductPage extends StatelessWidget {
             ),
           ],
         ),
-      );
-      },) ,
+      ),
     );
   }
 }
