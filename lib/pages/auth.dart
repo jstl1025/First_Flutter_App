@@ -86,9 +86,6 @@ class _AuthPageState extends State<AuthPage> {
           return 'Passwords do not match';
         }
       },
-      onSaved: (String value) {
-        _formData['email'] = value;
-      },
     );
   }
 
@@ -104,13 +101,37 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _sumbitForm(Function login) {
+  void _sumbitForm(Function login, Function signup) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _formKey.currentState.save();
-    login(_formData['email'], _formData['password']);
-    Navigator.pushNamed(context, '/products');
+    if (_authMode == AuthMode.Login) {
+      login(_formData['email'], _formData['password']);
+    } else {
+      final Map<String, dynamic> successInformation =
+          await signup(_formData['email'], _formData['password']);
+      if (successInformation['success']) {
+        Navigator.pushNamed(context, '/products');
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('An Error Occurred!'),
+                content: Text(successInformation['message']),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Okay'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+      }
+    }
   }
 
   @override
@@ -169,7 +190,8 @@ class _AuthPageState extends State<AuthPage> {
                         return RaisedButton(
                           textColor: Colors.white,
                           child: Text('LOGIN'),
-                          onPressed: () => _sumbitForm(model.login),
+                          onPressed: () =>
+                              _sumbitForm(model.login, model.signup),
                         );
                       },
                     ),
