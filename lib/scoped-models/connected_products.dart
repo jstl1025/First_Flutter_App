@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:first_app/models/location_data.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,8 +55,8 @@ mixin ProductsModel on ConnectedProductsModel {
     return _showFavorites;
   }
 
-  Future<bool> addProduct(
-      String title, String description, String image, double price) async {
+  Future<bool> addProduct(String title, String description, String image,
+      double price, LocationData locData) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> productData = {
@@ -66,6 +67,9 @@ mixin ProductsModel on ConnectedProductsModel {
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address
     };
     try {
       final http.Response response = await http.post(
@@ -84,6 +88,7 @@ mixin ProductsModel on ConnectedProductsModel {
           description: description,
           image: image,
           price: price,
+          location: locData,
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
       _products.add(newProduct);
@@ -103,7 +108,7 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   Future<bool> updateProduct(
-      String title, String description, String image, double price) {
+      String title, String description, String image, double price, LocationData locData) {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> updateData = {
@@ -113,7 +118,10 @@ mixin ProductsModel on ConnectedProductsModel {
           'https://www.eatthis.com/wp-content/uploads/2017/10/dark-chocolate-bar-squares.jpg',
       'price': price,
       'userEmail': selectedProduct.userEmail,
-      'userId': selectedProduct.userId
+      'userId': selectedProduct.userId,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address
     };
     return http
         .put(
@@ -127,6 +135,7 @@ mixin ProductsModel on ConnectedProductsModel {
           description: description,
           image: image,
           price: price,
+          location: locData,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId);
       _products[selectedProductIndex] = updatedProduct;
@@ -181,6 +190,10 @@ mixin ProductsModel on ConnectedProductsModel {
             description: productData['description'],
             image: productData['image'],
             price: productData['price'],
+            location: LocationData(
+                address: productData['loc_address'],
+                latitude: productData['loc_lat'],
+                longitude: productData['loc_lng']),
             userEmail: productData['userEmail'],
             userId: productData['userId'],
             isFavorite: productData['wishlistUsers'] == null
@@ -213,6 +226,7 @@ mixin ProductsModel on ConnectedProductsModel {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        location: selectedProduct.location,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
         isFavorite: newFavoriteStatus);
@@ -234,6 +248,7 @@ mixin ProductsModel on ConnectedProductsModel {
           description: selectedProduct.description,
           price: selectedProduct.price,
           image: selectedProduct.image,
+          location: selectedProduct.location,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId,
           isFavorite: !newFavoriteStatus);
@@ -244,8 +259,9 @@ mixin ProductsModel on ConnectedProductsModel {
 
   void selectProduct(String productId) {
     _selProductId = productId;
-
-    notifyListeners();
+    if (productId != null) {
+      notifyListeners();
+    }
   }
 
   void toggleDisplayMode() {
