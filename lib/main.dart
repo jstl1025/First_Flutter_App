@@ -1,4 +1,5 @@
 import 'package:first_app/pages/products_admin.dart';
+import 'package:first_app/widgets/helpers/custom_route.dart';
 import 'package:flutter/material.dart';
 import 'package:map_view/map_view.dart';
 // import 'package:flutter/rendering.dart';
@@ -72,15 +73,17 @@ class _MyAppState extends State<MyApp> {
                 _model.allProducts.firstWhere((Product product) {
               return product.id == productId;
             });
-            return MaterialPageRoute<bool>(
-              builder: (BuildContext context) => !_isAuthenticated ? AuthPage() : ProductPage(product),
+            return CustomRoute<bool>(
+              builder: (BuildContext context) =>
+                  !_isAuthenticated ? AuthPage() : ProductPage(product),
             );
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-              builder: (BuildContext context) => !_isAuthenticated ? AuthPage() : ProductsPage(_model));
+              builder: (BuildContext context) =>
+                  !_isAuthenticated ? AuthPage() : ProductsPage(_model));
         },
       ),
     );
