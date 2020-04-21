@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:first_app/models/product.dart';
+import 'package:first_app/shared/global_config.dart';
 import 'package:flutter/material.dart';
 import 'package:map_view/map_view.dart';
 import 'package:http/http.dart' as http;
@@ -54,7 +55,7 @@ class _LocationInputState extends State<LocationInput> {
       final Uri uri = Uri.https(
         'map.googleapis.com',
         '/maps/api/geocode/json',
-        {'address': address, 'key': 'AIzaSyC65WO5PPATtr9lINgzZ6kvIptKy9Q9FU8'},
+        {'address': address, 'key': apiKey},
       );
       final http.Response response = await http.get(uri);
       final decodedResponse = json.decode(response.body);
@@ -95,10 +96,7 @@ class _LocationInputState extends State<LocationInput> {
     final Uri uri = Uri.https(
       'map.googleapis.com',
       '/maps/api/geocode/json',
-      {
-        'latlng': '${lat.toString()},${lng.toString()}',
-        'key': 'AIzaSyC65WO5PPATtr9lINgzZ6kvIptKy9Q9FU8'
-      },
+      {'latlng': '${lat.toString()},${lng.toString()}', 'key': apiKey},
     );
     final http.Response response = await http.get(uri);
     final decodedResponse = json.decode(response.body);
@@ -107,13 +105,32 @@ class _LocationInputState extends State<LocationInput> {
 
   void _getUserLocation() async {
     final location = geoloc.Location();
-    final currentLocation = await location.getLocation();
-    final address =
-        await _getAddress(currentLocation.latitude, currentLocation.longitude);
-    _getStaticMap(address,
-        geocode: false,
-        lat: currentLocation.latitude,
-        lng: currentLocation.longitude);
+    try {
+      final currentLocation = await location.getLocation();
+      final address = await _getAddress(
+          currentLocation.latitude, currentLocation.longitude);
+      _getStaticMap(address,
+          geocode: false,
+          lat: currentLocation.latitude,
+          lng: currentLocation.longitude);
+    } catch (error) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Could not fetch location'),
+              content: Text('Please add an address manually'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          });
+    }
   }
 
   void _updateLocation() {

@@ -1,4 +1,6 @@
 import 'package:first_app/pages/products_admin.dart';
+import 'package:first_app/shared/adaptive_theme.dart';
+import 'package:first_app/shared/global_config.dart';
 import 'package:first_app/widgets/helpers/custom_route.dart';
 import 'package:flutter/material.dart';
 import 'package:map_view/map_view.dart';
@@ -13,7 +15,7 @@ import './scoped-models/main.dart';
 import './models/product.dart';
 
 void main() {
-  MapView.setApiKey('AIzaSyC65WO5PPATtr9lINgzZ6kvIptKy9Q9FU8');
+  MapView.setApiKey(apiKey);
   runApp(MyApp());
 }
 
@@ -43,12 +45,7 @@ class _MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
-        theme: ThemeData(
-          brightness: Brightness.light,
-          primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple,
-          buttonColor: Colors.deepPurple,
-        ),
+        theme: getAdaptiveThemeData(context),
         // home: AuthPage(),
         routes: {
           '/': (BuildContext context) =>

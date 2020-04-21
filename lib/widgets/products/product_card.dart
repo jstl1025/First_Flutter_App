@@ -10,9 +10,8 @@ import '../../scoped-models/main.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
-  final int productIndex;
 
-  ProductCard(this.product, this.productIndex);
+  ProductCard(this.product);
 
   Widget _buildTitlePriceRow() {
     return Container(
@@ -20,11 +19,12 @@ class ProductCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TitleDefault(product.title),
-            SizedBox(
+            Flexible(child: TitleDefault(product.title)),
+            Flexible(
+                child: SizedBox(
               width: 8.0,
-            ),
-            PriceTag(product.price.toString()),
+            )),
+            Flexible(child: PriceTag(product.price.toString())),
           ],
         ));
   }
@@ -39,21 +39,18 @@ class ProductCard extends StatelessWidget {
               icon: Icon(Icons.info),
               color: Theme.of(context).accentColor,
               onPressed: () {
-                model.selectProduct(model.allProducts[productIndex].id);
-                Navigator.pushNamed<bool>(context,
-                        '/product/' + model.allProducts[productIndex].id)
+                model.selectProduct(product.id);
+                Navigator.pushNamed<bool>(context, '/product/' + product.id)
                     .then((_) => model.selectProduct(null));
               },
             ),
             IconButton(
               icon: Icon(
-                model.allProducts[productIndex].isFavorite
-                    ? Icons.favorite
-                    : Icons.favorite_border,
+                product.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
               color: Colors.pink,
               onPressed: () {
-                model.selectProduct(model.allProducts[productIndex].id);
+                model.selectProduct(product.id);
                 model.toggleProductFavoriteStatus();
               },
             )
@@ -78,6 +75,9 @@ class ProductCard extends StatelessWidget {
             ),
           ),
           _buildTitlePriceRow(),
+          SizedBox(
+            height: 10.0,
+          ),
           AddressTag(product.location.address),
           _buildActionButtons(context),
         ],

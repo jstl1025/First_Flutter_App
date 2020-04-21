@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:first_app/widgets/form_inputs/image.dart';
+import 'package:first_app/widgets/ui_elements/adaptive_progress_indicator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:scoped_model/scoped_model.dart';
@@ -69,9 +71,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
           return 'Price is required and should be a number.';
         }
       },
-      onSaved: (String value) {
-        _formData['price'] = double.parse(value);
-      },
     );
   }
 
@@ -79,7 +78,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         return model.isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? Center(child: AdaptiveProgressIndicator())
             : RaisedButton(
                 textColor: Colors.white,
                 child: Text('Save'),
@@ -192,6 +191,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
             : Scaffold(
                 appBar: AppBar(
                   title: Text('Edit Product'),
+                  elevation: Theme.of(context).platform == TargetPlatform.iOS
+                      ? 0.0
+                      : 4.0,
                 ),
                 body: pageContent,
               );
